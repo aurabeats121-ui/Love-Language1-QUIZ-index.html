@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Language Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a0e;
+    --card: #16111a;
+    --surface: #1e1725;
+    --border: #2e2538;
+    --rose: #e8728a;
+    --gold: #c9a96e;
+    --lilac: #b89fd8;
+    --text: #f0e8f5;
+    --muted: #8a7a9b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(232,114,138,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 90%, rgba(184,159,216,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 60% 50%, rgba(201,169,110,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 580px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* INTRO SCREEN */
+  #intro {
+    text-align: center;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .heart-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  #intro h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 6vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--rose), var(--gold), var(--lilac));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  #intro p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+  }
+
+  .btn-start {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--rose), #c45a74);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px rgba(232,114,138,0.3);
+  }
+
+  .btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(232,114,138,0.45);
+  }
+
+  /* QUIZ SCREEN */
+  #quiz { display: none; animation: fadeUp 0.6s ease both; }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 10px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose), var(--lilac));
+    border-radius: 10px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .q-counter {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  .question-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 2rem;
+    color: var(--text);
+    min-height: 80px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-btn {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    padding: 16px 20px;
+    border-radius: 12px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(232,114,138,0.12), rgba(184,159,216,0.12));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .option-btn:hover {
+    border-color: var(--rose);
+    transform: translateX(4px);
+  }
+
+  .option-btn:hover::before { opacity: 1; }
+
+  .option-btn.selected {
+    border-color: var(--rose);
+    background: linear-gradient(135deg, rgba(232,114,138,0.15), rgba(184,159,216,0.1));
+    transform: translateX(6px);
+  }
+
+  .option-letter {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: var(--surface);
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-align: center;
+    line-height: 22px;
+    margin-right: 12px;
+    color: var(--muted);
+    transition: all 0.25s;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+
+  .option-btn.selected .option-letter {
+    background: var(--rose);
+    color: white;
+  }
+
+  .option-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .btn-next {
+    margin-top: 1.8rem;
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, var(--rose), #c45a74);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 6px 24px rgba(232,114,138,0.25);
+  }
+
+  .btn-next.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,114,138,0.4); }
+
+  /* RESULT SCREEN */
+  #result { display: none; text-align: center; animation: fadeUp 0.7s ease both; }
+
+  .result-emoji {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    animation: bounceIn 0.6s ease both 0.3s;
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .result-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--rose), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .result-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.75;
+    font-weight: 300;
+    max-width: 440px;
+    margin: 0 auto 2rem;
+  }
+
+  /* Score breakdown */
+  .score-breakdown {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .score-breakdown h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .score-row {
+    margin-bottom: 0.9rem;
+  }
+
+  .score-row-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+
+  .score-name { font-weight: 500; color: var(--text); }
+  .score-num { color: var(--muted); }
+
+  .score-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .btn-retry {
+    display: inline-block;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 400;
+  }
+
+  .btn-retry:hover { border-color: var(--rose); color: var(--rose); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-wrap { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="intro">
+    <span class="heart-icon">💗</span>
+    <h1>What's Your Love Language?</h1>
+    <p>15 quick questions to reveal how you give and receive love most deeply. Be honest — there are no right or wrong answers.</p>
+    <button class="btn-start" onclick="startQuiz()">Begin the Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="q-wrap" id="qWrap">
+      <p class="q-counter" id="qCounter">Question 1 of 15</p>
+      <p class="question-text" id="questionText"></p>
+      <div class="options" id="optionsContainer"></div>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <span class="result-emoji" id="resultEmoji"></span>
+    <p class="result-label">Your primary love language is</p>
+    <h2 class="result-title" id="resultTitle"></h2>
+    <p class="result-desc" id="resultDesc"></p>
+    <div class="score-breakdown" id="scoreBreakdown"></div>
+    <button class="btn-retry" onclick="restart()">Retake Quiz</button>
+  </div>
+
+</div>
+
+<script>
+const LANGUAGES = {
+  words: { name: "Words of Affirmation", emoji: "💬", color: "#e8728a",
+    desc: "You feel most loved through verbal expressions — hearing 'I love you', receiving heartfelt compliments, and words of encouragement. Criticism cuts deeply for you, but genuine praise lifts your entire world." },
+  acts: { name: "Acts of Service", emoji: "🛠️", color: "#c9a96e",
+    desc: "Actions speak louder than words for you. When someone does something thoughtful without being asked — cooking a meal, handling a task, showing up — it's the deepest form of love you can receive." },
+  gifts: { name: "Receiving Gifts", emoji: "🎁", color: "#b89fd8",
+    desc: "For you, a gift is a symbol of love and thoughtfulness. It's not about materialism — it's about knowing someone was thinking of you. A missed occasion can feel like being forgotten." },
+  touch: { name: "Physical Touch", emoji: "🤝", color: "#7ec8c8",
+    desc: "Physical presence and connection matter most to you. A hug, a hand squeeze, or simply sitting close communicates safety, love, and belonging in ways words never fully can." },
+  time: { name: "Quality Time", emoji: "⏳", color: "#98d4a3",
+    desc: "Your love language is undivided attention. When someone chooses to be truly present with you — no phones, no distractions — it says 'you matter to me' more than anything else ever could." }
+};
+
+const questions = [
+  { text: "Your partner surprises you. What would mean the most?", options: [
+    { text: "They write you a long, heartfelt message", lang: "words" },
+    { text: "They handle something stressful you've been dealing with", lang: "acts" },
+    { text: "They show up with a thoughtful gift", lang: "gifts" },
+    { text: "They plan an uninterrupted day together, just the two of you", lang: "time" },
+    { text: "They hold you close and don't let go", lang: "touch" }
+  ]},
+  { text: "You've had a really hard day. What helps you feel better most?", options: [
+    { text: "Being told everything will be okay and that you're loved", lang: "words" },
+    { text: "Someone taking tasks off your plate without asking", lang: "acts" },
+    { text: "Receiving a small 'thinking of you' gift", lang: "gifts" },
+    { text: "A long, warm hug from someone you trust", lang: "touch" },
+    { text: "Someone sitting quietly beside you, fully present", lang: "time" }
+  ]},
+  { text: "In a relationship, what bothers you most if it's missing?", options: [
+    { text: "Not hearing 'I love you' or 'I appreciate you' often enough", lang: "words" },
+    { text: "Your partner never helps out or notices what you need", lang: "acts" },
+    { text: "Being forgotten on birthdays or special moments", lang: "gifts" },
+    { text: "Lack of meaningful time spent together", lang: "time" },
+    { text: "Absence of physical closeness and affection", lang: "touch" }
+  ]},
+  { text: "How do you most naturally show love to others?", options: [
+    { text: "Telling them exactly what you love about them", lang: "words" },
+    { text: "Doing helpful things without being asked", lang: "acts" },
+    { text: "Finding the perfect gift for them", lang: "gifts" },
+    { text: "Giving a hug, a pat on the back, or squeezing their hand", lang: "touch" },
+    { text: "Dedicating your full, undivided attention to them", lang: "time" }
+  ]},
+  { text: "What makes you feel most connected to a close friend?", options: [
+    { text: "Deep conversations where they really hear you", lang: "time" },
+    { text: "When they remember something small about you and act on it", lang: "acts" },
+    { text: "When they randomly send you something you'd love", lang: "gifts" },
+    { text: "When they say exactly what you need to hear", lang: "words" },
+    { text: "When they lean on your shoulder or give you a warm hug", lang: "touch" }
+  ]},
+  { text: "Your partner is busy but still reaches out. What would touch you most?", options: [
+    { text: "A long voice note telling you how much you mean to them", lang: "words" },
+    { text: "Ordering your favorite food to be delivered to you", lang: "acts" },
+    { text: "Sending a little surprise gift 'just because'", lang: "gifts" },
+    { text: "Dropping everything to spend even an hour with you", lang: "time" },
+    { text: "A quick, spontaneous hug before they rush off", lang: "touch" }
+  ]},
+  { text: "Which of these feels most romantic to you?", options: [
+    { text: "A handwritten love letter with deep, personal words", lang: "words" },
+    { text: "Your partner cooking your favorite meal after a long week", lang: "acts" },
+    { text: "A surprise gift that shows they really 'get' you", lang: "gifts" },
+    { text: "Slow dancing or cuddling with no screens around", lang: "touch" },
+    { text: "A spontaneous road trip with no plan, just the two of you", lang: "time" }
+  ]},
+  { text: "You feel undervalued in a relationship when...", options: [
+    { text: "Your partner rarely says anything encouraging or loving", lang: "words" },
+    { text: "They never offer help even when you're clearly overwhelmed", lang: "acts" },
+    { text: "Special occasions come and go without acknowledgment", lang: "gifts" },
+    { text: "You barely spend any quality time together anymore", lang: "time" },
+    { text: "Physical affection has almost disappeared", lang: "touch" }
+  ]},
+  { text: "Which memory would mean the most to you looking back?", options: [
+    { text: "Something loving someone said to you at exactly the right moment", lang: "words" },
+    { text: "Someone going out of their way to make your life easier", lang: "acts" },
+    { text: "A meaningful, perfectly chosen gift you still keep", lang: "gifts" },
+    { text: "Hours of uninterrupted time with someone you love", lang: "time" },
+    { text: "The warmth of a long, comforting embrace", lang: "touch" }
+  ]},
+  { text: "Which compliment would land deepest for you?", options: [
+    { text: "'I notice everything you do and it means the world to me.'", lang: "acts" },
+    { text: "'Being around you is my favorite part of any day.'", lang: "time" },
+    { text: "'I saw this and immediately thought of you.'", lang: "gifts" },
+    { text: "'You are so smart, strong, and genuinely special.'", lang: "words" },
+    { text: "'I just want to hold you and never let go.'", lang: "touch" }
+  ]},
+  { text: "Your love language at a party. Which are you most likely to do?", options: [
+    { text: "Pull someone aside and tell them something sincere and meaningful", lang: "words" },
+    { text: "Quietly handle something to make the host's night easier", lang: "acts" },
+    { text: "Show up with a thoughtful gift for the host", lang: "gifts" },
+    { text: "Find your person and stay close — maybe hold hands or lean in", lang: "touch" },
+    { text: "Skip the crowd and go for a deep one-on-one chat", lang: "time" }
+  ]},
+  { text: "If your partner is apologizing, what would feel most genuine?", options: [
+    { text: "A heartfelt, articulate verbal apology", lang: "words" },
+    { text: "Immediately doing something to make things right", lang: "acts" },
+    { text: "A small meaningful token as a peace offering", lang: "gifts" },
+    { text: "Sitting close and holding you while they apologize", lang: "touch" },
+    { text: "Putting everything aside to talk it through fully", lang: "time" }
+  ]},
+  { text: "You feel truly 'seen' in a relationship when...", options: [
+    { text: "Your partner expresses how much they appreciate who you are", lang: "words" },
+    { text: "They remember your preferences and act on them", lang: "acts" },
+    { text: "They give you something that shows they really know you", lang: "gifts" },
+    { text: "They choose spending time with you over other options", lang: "time" },
+    { text: "They're physically close and affectionate without needing a reason", lang: "touch" }
+  ]},
+  { text: "What do you daydream about in a relationship?", options: [
+    { text: "Being told exactly why you are loved and admired", lang: "words" },
+    { text: "Having a partner who just handles things for you sometimes", lang: "acts" },
+    { text: "Someone who surprises you with perfectly chosen gifts", lang: "gifts" },
+    { text: "Long lazy days together with zero distractions", lang: "time" },
+    { text: "Falling asleep next to someone who holds you tight", lang: "touch" }
+  ]},
+  { text: "Finally — what do you most want a partner to know about you?", options: [
+    { text: "Your words shape my entire world — use them with love", lang: "words" },
+    { text: "When you help me, I feel deeply cared for", lang: "acts" },
+    { text: "Thoughtful gestures show me I'm on your mind", lang: "gifts" },
+    { text: "Your presence is the greatest gift you can give", lang: "time" },
+    { text: "Touch connects me to you in ways nothing else can", lang: "touch" }
+  ]}
+];
+
+let scores = { words: 0, acts: 0, gifts: 0, touch: 0, time: 0 };
+let current = 0;
+let selected = null;
+
+function startQuiz() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  selected = null;
+  const q = questions[current];
+  document.getElementById('qCounter').textContent = `Question ${current + 1} of ${questions.length}`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
+  document.getElementById('btnNext').classList.remove('visible');
+
+  const letters = ['A','B','C','D','E'];
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span style="display:inline">${opt.text}</span>`;
+    btn.onclick = () => selectOption(btn, opt.lang);
+    container.appendChild(btn);
+  });
+
+  // Re-wrap with animation
+  document.getElementById('qWrap').style.animation = 'none';
+  requestAnimationFrame(() => {
+    document.getElementById('qWrap').style.animation = 'fadeUp 0.4s ease both';
+  });
+}
+
+function selectOption(btn, lang) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected = lang;
+  document.getElementById('btnNext').classList.add('visible');
+}
+
+function nextQuestion() {
+  if (!selected) return;
+  scores[selected]++;
+  current++;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  const result = document.getElementById('result');
+  result.style.display = 'block';
+
+  const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  const lang = LANGUAGES[top];
+
+  document.getElementById('resultEmoji').textContent = lang.emoji;
+  document.getElementById('resultTitle').textContent = lang.name;
+  document.getElementById('resultDesc').textContent = lang.desc;
+
+  // Score breakdown
+  const total = questions.length;
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const breakdown = document.getElementById('scoreBreakdown');
+  breakdown.innerHTML = '<h3>Full Breakdown</h3>';
+
+  sorted.forEach(([key, val]) => {
+    const l = LANGUAGES[key];
+    const pct = Math.round((val / total) * 100);
+    breakdown.innerHTML += `
+      <div class="score-row">
+        <div class="score-row-header">
+          <span class="score-name">${l.emoji} ${l.name}</span>
+          <span class="score-num">${pct}%</span>
+        </div>
+        <div class="score-track">
+          <div class="score-fill" style="width:0%;background:${l.color}" data-w="${pct}"></div>
+        </div>
+      </div>`;
+  });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 200);
+}
+
+function restart() {
+  scores = { words: 0, acts: 0, gifts: 0, touch: 0, time: 0 };
+  current = 0; selected = null;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('intro').style.display = 'block';
+}
+</script>
+</body>
+</html>
